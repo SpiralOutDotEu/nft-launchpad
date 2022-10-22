@@ -1,7 +1,10 @@
-const Home = () => {
+import { ethers } from "ethers";
+import  UserWallet from "./UserWallet";
+
+function Home () {
     return(
         <div>
-            <h3> wallet exists</h3>
+            <UserWallet />
         </div>
     );
 };
