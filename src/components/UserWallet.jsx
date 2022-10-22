@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { ethers } from "ethers";
+import contract from '../contracts/NFTCollection.json'
+
+const contractAddress = "0x12C5ef89Fb24a569A37D703790c804774697fD7a";
+const abi = contract.abi;
+const price = "0.00001"
 
 function UserWallet() {
     const [address, setAddress] = useState();
@@ -42,11 +47,40 @@ function UserWallet() {
         logdiv.innerHTML += "</br>" + "connected with address: " + address
     };
 
+    async function mintNFT() {
+        var logdiv = document.getElementById('log');
+        try {
+          const { ethereum } = window;
+    
+          if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const nftContract = new ethers.Contract(contractAddress, abi, signer);
+            
+            logdiv.innerHTML += "</br>" + "Initialize payment" 
+            let nftTxn = await nftContract.mintNFTs(1, { value: ethers.utils.parseEther(price) });
+            
+            logdiv.innerHTML += "</br>" + "Mining... please wait"
+            await nftTxn.wait();
+    
+            logdiv.innerHTML += "</br>" + "Mined, see transaction: https://mumbai.polygonscan.com/tx/" + nftTxn.hash 
+            logdiv.innerHTML += "</br>" + "Go and trade your NFT in  OpenSea. Check the collection in <a href=\"https://testnets.opensea.io/collection/fishes-ac2cay6lcp\">" + "OpenSea </a>"
+            // console.log(`Mined, see transaction: https://mumbai.polygonscan.com/tx/${nftTxn.hash}`); // https://testnets.opensea.io/collection/fishes-ac2cay6lcp
+    
+          } else {
+            console.log("Ethereum object does not exist");
+          }
+    
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
     return (
         <div className="card">
             <div>
                 <button onClick={() => getWallet()}> Connect</button>
-                <button onClick={() => getWallet()}> Mint</button>
+                <button onClick={() => mintNFT()}> Mint</button>
             </div>
             <div id="log"></div>
         </div>
